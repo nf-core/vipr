@@ -1,3 +1,56 @@
 #ref_fasta: "/mnt/projects/chuwc/collinschu/October/nicaragua_5thFeb2018/metagenomics/result/out/zika_refer/zika_brazil_NC_035889.1.fa"
 ref_fasta: "data/ref/DENV2-NC_001474.2.fa"
-
+# cont_fasta needs to be bwa indexed already
+cont_fasta: "/mnt/projects/rpd/genomes/human_g1k_v37/human_g1k_v37.fasta"
+# FIXME relativ to exec path
+publishdir: "my-publishdir"
+samples:
+  PDH203_GTGGCC:
+    readunits:
+      ru-PDH203.1M.1:
+        flowcell_id: null
+        fq1: data/reads/PDH203_GTGGCC_NA_R1.1M.1.fastq.gz
+        fq2: data/reads/PDH203_GTGGCC_NA_R2.1M.1.fastq.gz
+        lane_id: null
+        library_id: PDH203_GTGGCC_NA
+        rg_id: null
+        run_id: null
+      ru-PDH203.1M.2:
+        flowcell_id: null
+        fq1: data/reads/PDH203_GTGGCC_NA_R1.1M.2.fastq.gz
+        fq2: data/reads/PDH203_GTGGCC_NA_R2.1M.2.fastq.gz
+        lane_id: null
+        library_id: PDH203_GTGGCC_NA
+        rg_id: null
+        run_id: null
+  PDH204_GTGGCC:
+    readunits:
+      ru-PDH204.1M:
+        flowcell_id: null
+        fq1: data/reads/PDH204_GTTTCG_NA_R1.1M.fastq.gz
+        fq2: data/reads/PDH204_GTTTCG_NA_R2.1M.fastq.gz
+        lane_id: null
+        library_id: PDH204_GTTTCG_NA
+        rg_id: null
+        run_id: null
+  PDH205_GTGGCC:
+    readunits:
+      ru-PDH205.1M:
+        flowcell_id: null
+        fq1: data/reads/PDH205_CGTACG_NA_R1.1M.fastq.gz
+        fq2: data/reads/PDH205_CGTACG_NA_R2.1M.fastq.gz
+        lane_id: null
+        library_id: PDH205_CGTACG
+        rg_id: null
+        run_id: null
+  PDH206_GTGGCC:
+    readunits:
+      ru-PDH206.1M:
+        flowcell_id: null
+        fq1: data/reads/PDH206_GAGTGG_NA_R1.1M.fastq.gz
+        fq2: data/reads/PDH206_GAGTGG_NA_R2.1M.fastq.gz
+        lane_id: null
+        library_id: PDH206_GAGTGG
+        rg_id: null
+        run_id: null
+    
