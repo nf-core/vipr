@@ -3,3 +3,4 @@ work/
 .nextflow
 .nextflow.log*
 nohup.out
+trace.txt.*

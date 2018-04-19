@@ -1,8 +1,7 @@
-#ref_fasta: "/mnt/projects/chuwc/collinschu/October/nicaragua_5thFeb2018/metagenomics/result/out/zika_refer/zika_brazil_NC_035889.1.fa"
 ref_fasta: "data/ref/DENV2-NC_001474.2.fa"
 # cont_fasta needs to be bwa indexed already
 cont_fasta: "/mnt/projects/rpd/genomes/human_g1k_v37/human_g1k_v37.fasta"
-# FIXME relativ to exec path
+kraken_db: "/mnt/projects/rpd/genomes/kraken/minikraken_20171019_8GB/"
 publishdir: "my-publishdir"
 samples:
   PDH203_GTGGCC:
