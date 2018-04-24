@@ -76,7 +76,7 @@ process trim_and_combine {
     memory '1 GB'
     time = '2h'
     beforeScript 'source /mnt/projects/rpd/rc/init.2017-04'// FIXME can we define this globally?
-    module 'skewer/0.2.2'
+    module 'skewer/0.2.2:fastqc/0.11.4'
     publishDir "${params.publishdir}/${sample_id}/reads/", mode: 'copy'
 
     input:
@@ -95,6 +95,7 @@ process trim_and_combine {
             cat *-trimmed-pair2.fastq.gz >> ${sample_id}_R2-trimmed.fastq.gz; 
             rm *-trimmed-pair[12].fastq.gz;
         done
+        fastqc -t {task.cpus} ${sample_id}_R1-trimmed.fastq.gz ${sample_id}_R2-trimmed.fastq.gz;
         """
 }
 
@@ -113,16 +114,16 @@ process decont {
         set file(cont_fasta), file(cont_amb), file(cont_ann), file(cont_bwt), \
             file(cont_pac), file(cont_sa) from cont_fasta_ch
     output:
-        set sample_id, file("${sample_id}_decont_1.fastq.gz"), file("${sample_id}_decont_2.fastq.gz") into \
+        set sample_id, file("${sample_id}_trimmed_decont_1.fastq.gz"), file("${sample_id}_trimmed_decont_2.fastq.gz") into \
             fastq_for_tadpole, fastq_for_polish_assembly_ch, fastq_for_mapping_ch, fastq_for_kraken_ch
-        set file("${sample_id}_decont_1_fastqc.zip"), file("${sample_id}_decont_2_fastqc.zip"), \
-            file("${sample_id}_decont_1_fastqc.html"), file("${sample_id}_decont_2_fastqc.html") into fastqc_ch
+        set file("${sample_id}_trimmed_decont_1_fastqc.zip"), file("${sample_id}_trimmed_decont_2_fastqc.zip"), \
+            file("${sample_id}_trimmed_decont_1_fastqc.html"), file("${sample_id}_trimmed_decont_2_fastqc.html") into fastqc_ch
     script:
         """
         # bbduk should be faster but uses plenty of memory (>32GB for human)
-        decont.py -i ${fq1} ${fq2} -t ${task.cpus} -c 0.5 -r ${cont_fasta} -o ${sample_id}_decont;
+        decont.py -i ${fq1} ${fq2} -t ${task.cpus} -c 0.5 -r ${cont_fasta} -o ${sample_id}_trimmed_decont;
         # since this is the last fastqc processing step, let's run fastqc here
-        fastqc -t {task.cpus} ${sample_id}_decont_1.fastq.gz ${sample_id}_decont_2.fastq.gz;
+        fastqc -t {task.cpus} ${sample_id}_trimmed_decont_1.fastq.gz ${sample_id}_trimmed_decont_2.fastq.gz;
         """
 }
 
@@ -197,7 +198,7 @@ process polish_assembly {
     tag { "Polishing assembly for " + sample_id }
     cpus 4
     memory '4 GB'
-    time = '2h'
+    time = '5h'
     beforeScript 'source /mnt/projects/rpd/rc/init.2017-04'// FIXME can we define this globally?
     module 'polish-viral-ref/a7b09b9:seqtk/4feb6e8'
     //publishDir '/data/chunks' FIXME where
@@ -232,7 +233,7 @@ process final_mapping {
         set sample_id, file(ref_fa), file(fq1), file(fq2) \
             from polished_assembly_ch.join(fastq_for_mapping_ch)
     output:
-        set sample_id, file(ref_fa), file("${sample_id}.bam"), file("${sample_id}.bam") into \
+        set sample_id, file(ref_fa), file("${sample_id}.bam"), file("${sample_id}.bam.bai") into \
             final_mapping_for_vcf_ch, final_mapping_for_cov_ch
         set sample_id, "${sample_id}.bam.stats" into final_mapping_bamstats_ch
     script:
@@ -244,6 +245,7 @@ process final_mapping {
             lofreq alnqual -u - ${ref_fa} | \
             lofreq indelqual --dindel -f ${ref_fa} - | \
             samtools sort -o ${sample_id}.bam -T ${sample_id}.final.tmp -;
+        samtools index ${sample_id}.bam;
         samtools stats ${sample_id}.bam > ${sample_id}.bam.stats
         """        
 }
@@ -253,7 +255,7 @@ process var_calling {
     tag { "Final variant calling for " + sample_id }
     cpus 4
     memory '4 GB'
-    time = '6h'
+    time = '8h'
     beforeScript 'source /mnt/projects/rpd/rc/init.2017-04'// FIXME can we define this globally?
     module "lofreq/2.1.3.1:samtools/1.3"
     publishDir "${params.publishdir}/${sample_id}/", mode: 'copy'
@@ -266,7 +268,7 @@ process var_calling {
         """
         samtools faidx ${ref_fa};
         lofreq call-parallel --pp-threads ${task.cpus} -f ${ref_fa} \
-           --call-indels -o ${sample_id}.vcf.gz ${bam}
+           -d 1000000 --call-indels -o ${sample_id}.vcf.gz ${bam}
         """        
 }
 

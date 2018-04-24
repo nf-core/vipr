@@ -4,3 +4,6 @@ work/
 .nextflow.log*
 nohup.out
 trace.txt.*
+report.html.[0-9]*
+trace.txt
+report.html
