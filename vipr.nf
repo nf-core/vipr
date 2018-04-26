@@ -140,13 +140,13 @@ process kraken {
     input:
         set sample_id, file(fq1), file(fq2) from fastq_for_kraken_ch
     output:
-        file("${sample_id}_kraken.report.txt")
+        file("${sample_id}_kraken.report")
     script:
         """
         kraken --threads ${task.cpus} --preload --db ${kraken_db} \
           -paired ${fq1} ${fq2} > kraken.out;
         # do not gzip! otherwise kraken-report happily runs (with some warnings) and produces rubbish results
-        kraken-report --db ${kraken_db} kraken.out > ${sample_id}_kraken.report.txt
+        kraken-report --db ${kraken_db} kraken.out > ${sample_id}_kraken.report
         """
 }
 
@@ -253,9 +253,9 @@ process final_mapping {
 
 process var_calling {
     tag { "Final variant calling for " + sample_id }
-    cpus 4
+    cpus 8
     memory '4 GB'
-    time = '8h'
+    time = '12h'
     beforeScript 'source /mnt/projects/rpd/rc/init.2017-04'// FIXME can we define this globally?
     module "lofreq/2.1.3.1:samtools/1.3"
     publishDir "${params.publishdir}/${sample_id}/", mode: 'copy'
@@ -300,22 +300,21 @@ process vipr_tools {
     memory '1 GB'
     time = '1h'
     beforeScript 'source /mnt/projects/rpd/rc/init.2017-04'// FIXME can we define this globally?
-    module "miniconda3:vipr-tools/5a19c2f"// FIXME ugly but needed for sourcing matplotlib. put into it's own env?
+    module "miniconda3:vipr-tools/81b0782"// FIXME ugly but needed for sourcing matplotlib. put into it's own env?
     publishDir "${params.publishdir}/${sample_id}/", mode: 'copy'
 
     input:
         set sample_id, file(cov), file(ref_fa), file(vcf) from cov_ch.join(vcf_ch)
     output:
-        set sample_id, file("${sample_id}_af-vs-cov.png"), file("${sample_id}_0cov2N.fa")
+        set sample_id, file("${sample_id}_af-vs-cov.html"), file("${sample_id}_0cov2N.fa")
     script:
         """
         # prevent CONDA_PATH_BACKUP: unbound variable
         set +u; source activate matplotlib-py3-2.2.2; set -u;
-        vipr_af_vs_cov.py --vcf ${vcf} --cov ${cov} --plot ${sample_id}_af-vs-cov.png;
+        vipr_af_vs_cov_html.py --vcf ${vcf} --cov ${cov} --plot ${sample_id}_af-vs-cov.html;
         vipr_gaps_to_n.py -i ${ref_fa} -c ${cov} > ${sample_id}_0cov2N.fa;
         """
 }
-
 
 /* Introspection
  *
