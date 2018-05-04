@@ -72,11 +72,6 @@ Channel
 
 process trim_and_combine {
     tag { "Preprocessing of " + reads.size()/2 + "  read pairs for " + sample_id }
-    cpus 4//runs in minutes on this type of data
-    memory '1 GB'
-    time = '2h'
-    beforeScript 'source /mnt/projects/rpd/rc/init.2017-04'// FIXME can we define this globally?
-    module 'skewer/0.2.2:fastqc/0.11.4'
     publishDir "${params.publishdir}/${sample_id}/reads/", mode: 'copy'
 
     input:
@@ -102,11 +97,6 @@ process trim_and_combine {
 
 process decont {
     tag { "Decontaminating " + sample_id }
-    cpus 4
-    memory '8 GB'
-    time = '6h'
-    beforeScript 'source /mnt/projects/rpd/rc/init.2017-04'// FIXME can we define this globally?
-    module 'decont/0.5:fastqc/0.11.4'
     publishDir "${params.publishdir}/${sample_id}/reads/", mode: 'copy'
     
     input:
@@ -119,8 +109,8 @@ process decont {
         set file("${sample_id}_trimmed_decont_1_fastqc.zip"), file("${sample_id}_trimmed_decont_2_fastqc.zip"), \
             file("${sample_id}_trimmed_decont_1_fastqc.html"), file("${sample_id}_trimmed_decont_2_fastqc.html") into fastqc_ch
     script:
+        // bbduk should be faster but uses plenty of memory (>32GB for human)
         """
-        # bbduk should be faster but uses plenty of memory (>32GB for human)
         decont.py -i ${fq1} ${fq2} -t ${task.cpus} -c 0.5 -r ${cont_fasta} -o ${sample_id}_trimmed_decont;
         # since this is the last fastqc processing step, let's run fastqc here
         fastqc -t {task.cpus} ${sample_id}_trimmed_decont_1.fastq.gz ${sample_id}_trimmed_decont_2.fastq.gz;
@@ -130,11 +120,6 @@ process decont {
 
 process kraken {
     tag { "Running Kraken on " + sample_id }
-    cpus 4
-    memory '10 GB'
-    time = '2h'
-    beforeScript 'source /mnt/projects/rpd/rc/init.2017-04'// FIXME can we define this globally?
-    module "kraken/1.0"
     publishDir "${params.publishdir}/${sample_id}/", mode: 'copy'
 
     input:
@@ -153,11 +138,6 @@ process kraken {
 
 process tadpole {
     tag { "Tadpole assembly of " + sample_id }
-    cpus 1//runs in minutes on this type of data
-    memory '10 GB'
-    time = '1h'
-    beforeScript 'source /mnt/projects/rpd/rc/init.2017-04'// FIXME can we define this globally?
-    module 'bbmap/37.17'
     publishDir "${params.publishdir}/${sample_id}/", mode: 'copy'
     
     input:
@@ -173,11 +153,6 @@ process tadpole {
 
 process gap_fill_assembly {
     tag { "Orienting and gap filling contigs for " + sample_id }
-    cpus 1
-    memory '1 GB'
-    time = '1h'
-    beforeScript 'source /mnt/projects/rpd/rc/init.2017-04'// FIXME can we define this globally?
-    module 'simple-contig-joiner/91ab4d9'
     publishDir "${params.publishdir}/${sample_id}/", mode: 'copy'
 
     input:
@@ -196,12 +171,6 @@ process gap_fill_assembly {
 
 process polish_assembly {
     tag { "Polishing assembly for " + sample_id }
-    cpus 4
-    memory '4 GB'
-    time = '5h'
-    beforeScript 'source /mnt/projects/rpd/rc/init.2017-04'// FIXME can we define this globally?
-    module 'polish-viral-ref/a7b09b9:seqtk/4feb6e8'
-    //publishDir '/data/chunks' FIXME where
     publishDir "${params.publishdir}/${sample_id}/", mode: 'copy'
     
     input:
@@ -222,11 +191,6 @@ process polish_assembly {
 
 process final_mapping {
     tag { "Mapping to polished assembly for " + sample_id }
-    cpus 4
-    memory '4 GB'
-    time = '2h'
-    beforeScript 'source /mnt/projects/rpd/rc/init.2017-04'// FIXME can we define this globally?
-    module "lofreq/2.1.3.1:bwa/0.7.15:samtools/1.3"
     publishDir "${params.publishdir}/${sample_id}/", mode: 'copy'
 
     input:
@@ -253,11 +217,6 @@ process final_mapping {
 
 process var_calling {
     tag { "Final variant calling for " + sample_id }
-    cpus 8
-    memory '4 GB'
-    time = '12h'
-    beforeScript 'source /mnt/projects/rpd/rc/init.2017-04'// FIXME can we define this globally?
-    module "lofreq/2.1.3.1:samtools/1.3"
     publishDir "${params.publishdir}/${sample_id}/", mode: 'copy'
 
     input:
@@ -275,11 +234,6 @@ process var_calling {
 
 process genomecov {
     tag { "Genome coverage for " + sample_id }
-    cpus 4
-    memory '1 GB'
-    time = '2h'
-    beforeScript 'source /mnt/projects/rpd/rc/init.2017-04'// FIXME can we define this globally?
-    module "bedtools/2.25.0"
     publishDir "${params.publishdir}/${sample_id}/", mode: 'copy'
 
     input:
@@ -296,11 +250,6 @@ process genomecov {
 
 process vipr_tools {
     tag { "Plotting AF vs. coverage and readying fasta for  " + sample_id }
-    cpus 1
-    memory '1 GB'
-    time = '1h'
-    beforeScript 'source /mnt/projects/rpd/rc/init.2017-04'// FIXME can we define this globally?
-    module "miniconda3:vipr-tools/81b0782"// FIXME ugly but needed for sourcing matplotlib. put into it's own env?
     publishDir "${params.publishdir}/${sample_id}/", mode: 'copy'
 
     input:
