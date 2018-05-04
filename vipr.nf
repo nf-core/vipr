@@ -154,17 +154,30 @@ process tadpole {
 process gap_fill_assembly {
     tag { "Orienting and gap filling contigs for " + sample_id }
     publishDir "${params.publishdir}/${sample_id}/", mode: 'copy'
-
+    // capture special error code, telling us that we cannot proceed for valid reasons.
+    // meaning of consequently missing downstream files needs to be reflected in docs
+    errorStrategy = { task.exitStatus == 3 ? 'ignore' : 'terminate' }
+    
     input:
         set sample_id, file(contigs_fa) from contigs_ch
         file(input_ref_fasta)    
     output:
-        set sample_id, file("${sample_id}-gap-filled-assembly.fa"), file("${sample_id}-gap-filled-assembly.gaps.bed") into gap_filled_assembly_ch
+        set sample_id, file("${sample_id}-gap-filled-assembly.fa"), file("${sample_id}-gap-filled-assembly.gaps.bed") \
+            into gap_filled_assembly_ch
     script:
         """
+        set +e;
+        log=${sample_id}-gap-filled-assembly.log;
         simple_contig_joiner.py -c ${contigs_fa} -r ${input_ref_fasta} \
           -s "${sample_id}-gap-filled-assembly" -o ${sample_id}-gap-filled-assembly.fa \
-          -b "${sample_id}-gap-filled-assembly.gaps.bed"
+          -b "${sample_id}-gap-filled-assembly.gaps.bed" >& \$log;
+
+        rc=\$?
+        if [ \$rc -ne 0 ]; then
+            # nothing to join, means we cannot continue. so stop here.
+            grep 'Nothing to join' \$log && exit 3;
+            exit \$rc;
+        fi
         """
 }
 
