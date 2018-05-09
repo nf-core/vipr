@@ -47,7 +47,7 @@ internet connection, you'll need to download and transfer the pipeline
 files manually:
 
 ```bash
-# Download the latest release of the pipeline (see https://github.com/nf-core/methylseq/releases)
+# Download the latest release of the pipeline (see https://github.com/nf-core/vipr/releases)
 curl -L https://github.com/nf-core/vipr/archive/1.0.zip -o nf-core-vipr-v1.0.zip
 unzip nf-core-vipr-v1.0.zip
 cd /path/to/my/data
@@ -88,7 +88,7 @@ Running the pipeline with the option `-with-singularity` or
 [Singularity](http://singularity.lbl.gov/) or Docker for this run. An
 image containing all of the software requirements will be
 automatically fetched and used
-(https://hub.docker.com/r/nf-core/methylseq).
+(https://hub.docker.com/r/nf-core/vipr).
 
 If running offline with Singularity, you'll need to download and transfer the Singularity image first:
 
@@ -119,7 +119,7 @@ source activate nfcore-vipr-1.3 # Name depends on version
 
 The [`environment.yml`](../environment.yml) file is packaged with the
 pipeline. Note that you may need to download this file from the
-[GitHub project page](https://github.com/nf-core/methylseq) if
+[GitHub project page](https://github.com/nf-core/vipr) if
 nextflow is automatically fetching the pipeline files. Ensure that the
 bioconda environment file version matches the pipeline version that
 you run.
@@ -155,7 +155,7 @@ The nf-core/vipr pipeline requires
 
 - a viral reference genome for read alignment
 - a host reference genome for decontamination (needs to be BWA indexed)
-- a kraken database for read classification
+- a [Kraken database](https://ccb.jhu.edu/software/kraken/) for read classification
 
 The corresponding entry in params.yaml looks as follows:
 

@@ -22,16 +22,16 @@ results.
 
 ### Pipeline Steps
 
-| Step                                            | Main program/s          |
-|-------------------------------------------------|-------------------------|
-| Trimming and combining of read-pairs per sample | Skewer, FastQC          |
-| Decontamination                                 | BWA                     |
-| Metagenomics classifcation / Sample purity      | Kraken                  |
-| Assembly to contigs                             | BBtools' Tadpole        |
-| Assembly polishing (two processes)              | Mummer's Nucmer, LoFreq |
-| Mapping to assembly                             | BWA, LoFreq             |
-| Low frequency variant calling                   | LoFreq                  |
-| Coverage and variant AF plots (two processes)   | Bedtools, Plotly        |
+| Step                                                | Main program/s                      |
+|-----------------------------------------------------|-------------------------------------|
+| Trimming, combining and QC of read-pairs per sample | Skewer, FastQC                      |
+| Decontamination                                     | BWA                                 |
+| Metagenomics classifcation / Sample purity          | Kraken                              |
+| Assembly to contigs                                 | BBtools' Tadpole                    |
+| Assembly polishing                                  | ViPR Tools, Mummer's Nucmer, LoFreq |
+| Mapping to assembly                                 | BWA, LoFreq                         |
+| Low frequency variant calling                       | LoFreq                              |
+| Coverage and variant AF plots (two processes)       | Bedtools, ViPR Tools                |
 
 
 
@@ -48,14 +48,15 @@ The nf-core/vipr pipeline comes with documentation about the pipeline, found in 
 
 These scripts were originally written for use at the [Genome Institute of Singapore](http://a-star.edu.sg/gis)
 
-ViPR had three predecessors:
-- ViPR1: FIXME
-- ViPR2: FIXME
-- ViPR3: FIXME
+ViPR mainly started out as an ecosystem around LoFreq an went through
+a couple of iterations. The current version had three predecessors
+[ViPR 1](https://github.com/CSB5/vipr),
+[ViPR 2](https://github.com/CSB5/vipr2) and [ViPR
+3](https://github.com/gis-rpd/pipelines/tree/master/germs/vipr)
 
-Supporting publications for older versions:
-- FIXME
-- FIXME
+An incomplete list of publications using ViPR (older versions):
+- [Sessions et. al., PLoS Negl Trop Dis., 2015](https://www.ncbi.nlm.nih.gov/pubmed/26327586)
+- [Sim et al., PLoS Negl Trop Dis., 2015](https://www.ncbi.nlm.nih.gov/pubmed/26325059)
 
 
 * Main author:
