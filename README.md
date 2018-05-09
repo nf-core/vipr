@@ -19,16 +19,27 @@ bioinformatics workflow tool. It pre-processes raw data from FastQ
 inputs, aligns the reads and performs extensive quality-control on the
 results.
 
+ViPR mainly started out as an ecosystem around LoFreq an went through
+a couple of iterations. The current version had three predecessors
+[ViPR 1](https://github.com/CSB5/vipr),
+[ViPR 2](https://github.com/CSB5/vipr2) and [ViPR
+3](https://github.com/gis-rpd/pipelines/tree/master/germs/vipr)
+
+An incomplete list of publications using (previous versions of) ViPR:
+
+- [Sessions et. al., PLoS Negl Trop Dis., 2015](https://www.ncbi.nlm.nih.gov/pubmed/26327586)
+- [Sim et al., PLoS Negl Trop Dis., 2015](https://www.ncbi.nlm.nih.gov/pubmed/26325059)
+
 
 ### Pipeline Steps
 
 | Step                                                | Main program/s                      |
 |-----------------------------------------------------|-------------------------------------|
-| Trimming, combining and QC of read-pairs per sample | Skewer, FastQC                      |
-| Decontamination                                     | BWA                                 |
+| Trimming, combining of read-pairs per sample and QC | Skewer, FastQC                      |
+| Decontamination                                     | decont: BWA                         |
 | Metagenomics classifcation / Sample purity          | Kraken                              |
 | Assembly to contigs                                 | BBtools' Tadpole                    |
-| Assembly polishing                                  | ViPR Tools, Mummer's Nucmer, LoFreq |
+| Assembly polishing                                  | ViPR Tools: Mummer's Nucmer, LoFreq |
 | Mapping to assembly                                 | BWA, LoFreq                         |
 | Low frequency variant calling                       | LoFreq                              |
 | Coverage and variant AF plots (two processes)       | Bedtools, ViPR Tools                |
@@ -37,7 +48,7 @@ results.
 
 ### Documentation
 
-The nf-core/vipr pipeline comes with documentation about the pipeline, found in the `docs/` directory:
+Documentation about the pipeline can be found in the `docs/` directory:
 
 1. [Installation and configuration](docs/installation.md)
 2. [Running the pipeline](docs/usage.md)
@@ -46,18 +57,13 @@ The nf-core/vipr pipeline comes with documentation about the pipeline, found in 
 
 ### Credits
 
-These scripts were originally written for use at the [Genome Institute of Singapore](http://a-star.edu.sg/gis)
+This pipeline was developed at the [Genome Institute of Singapore](http://a-star.edu.sg/gis)
+by [Andreas Wilm](https://github.com/andreas-wilm/).
 
-ViPR mainly started out as an ecosystem around LoFreq an went through
-a couple of iterations. The current version had three predecessors
-[ViPR 1](https://github.com/CSB5/vipr),
-[ViPR 2](https://github.com/CSB5/vipr2) and [ViPR
-3](https://github.com/gis-rpd/pipelines/tree/master/germs/vipr)
+Plenty of people provided essential feedback, including:
 
-An incomplete list of publications using ViPR (older versions):
-- [Sessions et. al., PLoS Negl Trop Dis., 2015](https://www.ncbi.nlm.nih.gov/pubmed/26327586)
-- [Sim et al., PLoS Negl Trop Dis., 2015](https://www.ncbi.nlm.nih.gov/pubmed/26325059)
-
-
-* Main author:
-  * Andreas Wilm ([@ewels](https://github.com/andreas-wilm/))
+- [October SESSIONS](https://www.duke-nus.edu.sg/content/sessions-october)
+- [Paola Florez DE SESSIONS](https://www.a-star.edu.sg/gis/Our-People/Platform-Leaders)
+- ZHU Yuan
+- Shuzhen SIM
+- CHU Wenhan Collins
