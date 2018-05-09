@@ -2,28 +2,37 @@
 /*
  * vim: syntax=groovy
  * -*- mode: groovy;-*-
+ *
+ ===============================================================================
+ ViPR: Viral amplicon analysis and intrahost / low-frequency variant calling
+ ===============================================================================
+ # Homepage / Documentation
+ https://github.com/nf-core/vipr
+ # Authors
+ Andreas Wilm <wilma@gis.a-star.edu.sg>
+ -------------------------------------------------------------------------------
  */
 
 
-// pipeline was developed/testing using this minimal version
+// Check that Nextflow version is up to date enough
 nf_required_version = '0.28'
-if( ! nextflow.version.matches(">= $nf_required_version") ){
-    throw GroovyException("Nextflow version too old: ${workflow.nextflow.version} < ${nf_required_version}")
+try {
+    if( ! nextflow.version.matches(">= $nf_required_version") ){
+        throw GroovyException("Nextflow version too old: ${workflow.nextflow.version} < ${nf_required_version}")
+    }
+} catch (all) {
+  log.error "====================================================\n" +
+            "  Nextflow version $params.nf_required_version required! You are running v$workflow.nextflow.version.\n" +
+            "  Pipeline execution will continue, but things may break.\n" +
+            "  Please run `nextflow self-update` to update Nextflow.\n" +
+            "============================================================"
 }
 
 
 // FIXME verify that input files are not checked/downloaded on the exec host
 
-
-/*
-println "Full params debug output:"
-params.each{ k, v -> println " ${k}:${v}" }
-println ""
-params.readunits.each{
-    println " ${it.key}: ${it.value}"
-}
-*/
-
+/* Input validation
+ */
 
 if (params.publishdir == null)
   exit 1, "publishdir missing from params"
@@ -35,19 +44,15 @@ if (!input_ref_fasta.exists())
 cont_fasta = file(params.cont_fasta)
 if (!cont_fasta.exists()) 
   exit 1, "Missing contamination fasta file: ${cont_fasta}"
-cont_fasta_ch = Channel.from(
-    file(cont_fasta), file(cont_fasta + ".amb"), file(cont_fasta + ".ann"),
-    file(cont_fasta + ".bwt"), file(cont_fasta + ".pac"),
-    file(cont_fasta + ".sa")).toList()
-//cont_fasta_ch.subscribe { println "cont_fasta_ch $it" }
 
 kraken_db = file(params.kraken_db)
 if (!kraken_db.exists()) 
   exit 1, "Missing contamination fasta file: ${kraken_db}"
 
 
-sample_keys = params.samples.keySet()
-println "List of samples: " +  sample_keys.join(", ")
+log.info "=================================================="
+log.info " nf-core/vipr : Viral amplicon analysis v${params.version}"
+log.info "=================================================="
 
 
 def GetReadPair = { sk, rk ->
@@ -55,21 +60,36 @@ def GetReadPair = { sk, rk ->
           file(params.samples[sk].readunits[rk]['fq2']))
 }
 
+
 def GetReadUnitKeys = { sk ->
     params.samples[sk].readunits.keySet()
 }
 
-/* channel with sample name as key and all read pairs following 
+
+/* input channel for references used in decontamination step
+ */
+cont_fasta_ch = Channel.from(
+    file(cont_fasta), file(cont_fasta + ".amb"), file(cont_fasta + ".ann"),
+    file(cont_fasta + ".bwt"), file(cont_fasta + ".pac"),
+    file(cont_fasta + ".sa")).toList()
+//cont_fasta_ch.subscribe { println "cont_fasta_ch $it" }
+
+
+/* input for fastq files. channel has sample name as key and all read pairs following 
  * see https://groups.google.com/forum/#!topic/nextflow/CF7Joh5xrkU
-*/
+ */
+sample_keys = params.samples.keySet()
+println "List of samples: " +  sample_keys.join(", ")
 Channel
     .from(sample_keys)
     .map { sk -> tuple(sk, GetReadUnitKeys(sk).collect{GetReadPair(sk, it)}.flatten()) }
     .set { fastq_ch }
-
 //fastq_ch.subscribe { println "$it" }
 
 
+
+/* Trim and combine read-pairs per sample
+ */
 process trim_and_combine {
     tag { "Preprocessing of " + reads.size()/2 + "  read pairs for " + sample_id }
     publishDir "${params.publishdir}/${sample_id}/reads/", mode: 'copy'
@@ -95,6 +115,8 @@ process trim_and_combine {
 }
 
 
+/* Decontaminate reads against host reference
+ */
 process decont {
     tag { "Decontaminating " + sample_id }
     publishDir "${params.publishdir}/${sample_id}/reads/", mode: 'copy'
@@ -118,6 +140,8 @@ process decont {
 }
 
 
+/* Metagenomics classification: QC for sample purity
+ */
 process kraken {
     tag { "Running Kraken on " + sample_id }
     publishDir "${params.publishdir}/${sample_id}/", mode: 'copy'
@@ -136,9 +160,13 @@ process kraken {
 }
 
 
-process tadpole {
-    tag { "Tadpole assembly of " + sample_id }
-    publishDir "${params.publishdir}/${sample_id}/", mode: 'copy'
+/* Assembly of reads. only few programs can assemble at the depth
+ * possible for such samples (>100k). tadpole gave consistently better
+ * results (fewer errors/variants) than spades (with diginorm)
+ */
+process tadpole { tag {
+"Tadpole assembly of " + sample_id } publishDir
+"${params.publishdir}/${sample_id}/", mode: 'copy'
     
     input:
         set sample_id, file(fq1), file(fq2) from fastq_for_tadpole
@@ -151,6 +179,8 @@ process tadpole {
 }
 
 
+/* Orient contigs according to reference and fill gaps with reference
+ */
 process gap_fill_assembly {
     tag { "Orienting and gap filling contigs for " + sample_id }
     publishDir "${params.publishdir}/${sample_id}/", mode: 'copy'
@@ -182,6 +212,8 @@ process gap_fill_assembly {
 }
 
 
+/* Polish assembly by repeated mapping, variant calling and variant incorporation 
+ */
 process polish_assembly {
     tag { "Polishing assembly for " + sample_id }
     publishDir "${params.publishdir}/${sample_id}/", mode: 'copy'
@@ -202,6 +234,8 @@ process polish_assembly {
 }
 
 
+/* mapping against polished assembly
+ */
 process final_mapping {
     tag { "Mapping to polished assembly for " + sample_id }
     publishDir "${params.publishdir}/${sample_id}/", mode: 'copy'
@@ -228,6 +262,8 @@ process final_mapping {
 }
 
 
+/* Low frequency variant calling
+ */
 process var_calling {
     tag { "Final variant calling for " + sample_id }
     publishDir "${params.publishdir}/${sample_id}/", mode: 'copy'
@@ -245,6 +281,10 @@ process var_calling {
 }
 
 
+/* Compute coverage 
+*
+ * FIXME: fast process, best joined with another process
+ */
 process genomecov {
     tag { "Genome coverage for " + sample_id }
     publishDir "${params.publishdir}/${sample_id}/", mode: 'copy'
@@ -261,6 +301,8 @@ process genomecov {
 }
 
 
+/* Plot coverage and variant AF. Also polish reference for upload
+ */
 process vipr_tools {
     tag { "Plotting AF vs. coverage and readying fasta for  " + sample_id }
     publishDir "${params.publishdir}/${sample_id}/", mode: 'copy'
@@ -277,6 +319,7 @@ process vipr_tools {
         vipr_gaps_to_n.py -i ${ref_fa} -c ${cov} > ${sample_id}_0cov2N.fa;
         """
 }
+
 
 /* Introspection
  *
