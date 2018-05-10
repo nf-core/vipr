@@ -15,10 +15,9 @@
 
 
 // Check that Nextflow version is up to date enough
-nf_required_version = '0.28'
 try {
-    if( ! nextflow.version.matches(">= $nf_required_version") ){
-        throw GroovyException("Nextflow version too old: ${workflow.nextflow.version} < ${nf_required_version}")
+    if( ! nextflow.version.matches(">= $params.nf_required_version") ){
+        throw GroovyException("Nextflow version too old: ${workflow.nextflow.version} < $params.nf_required_version")
     }
 } catch (all) {
   log.error "====================================================\n" +
@@ -29,14 +28,9 @@ try {
 }
 
 
-// FIXME verify that input files are not checked/downloaded on the exec host
 
 /* Input validation
  */
-
-if (params.publishdir == null)
-  exit 1, "publishdir missing from params"
-
 input_ref_fasta = file(params.ref_fasta)
 if (!input_ref_fasta.exists()) 
   exit 1, "Missing input reference fasta file: ${input_ref_fasta}"
@@ -45,10 +39,11 @@ cont_fasta = file(params.cont_fasta)
 if (!cont_fasta.exists()) 
   exit 1, "Missing contamination fasta file: ${cont_fasta}"
 
-kraken_db = file(params.kraken_db)
-if (!kraken_db.exists()) 
-  exit 1, "Missing contamination fasta file: ${kraken_db}"
-
+if(!params.skip_kraken) {
+    kraken_db = file(params.kraken_db)
+    if (!kraken_db.exists()) 
+    exit 1, "Missing contamination fasta file: ${kraken_db}"
+}
 
 log.info "=================================================="
 log.info " nf-core/vipr : Viral amplicon analysis v${params.version}"
@@ -56,6 +51,8 @@ log.info "=================================================="
 
 
 def GetReadPair = { sk, rk ->
+    // FIXME if files don't exist, their path might be relative to the input yaml
+    // see https://gist.github.com/ysb33r/5804364
     tuple(file(params.samples[sk].readunits[rk]['fq1']),
           file(params.samples[sk].readunits[rk]['fq2']))
 }
@@ -75,7 +72,8 @@ cont_fasta_ch = Channel.from(
 //cont_fasta_ch.subscribe { println "cont_fasta_ch $it" }
 
 
-/* input for fastq files. channel has sample name as key and all read pairs following 
+/* FIXME allow other means of defining input, e.g. CSV.
+ * input for fastq files. channel has sample name as key and all read pairs following 
  * see https://groups.google.com/forum/#!topic/nextflow/CF7Joh5xrkU
  */
 sample_keys = params.samples.keySet()
@@ -92,7 +90,7 @@ Channel
  */
 process trim_and_combine {
     tag { "Preprocessing of " + reads.size()/2 + "  read pairs for " + sample_id }
-    publishDir "${params.publishdir}/${sample_id}/reads/", mode: 'copy'
+    //publishDir "${params.outdir}/${sample_id}/reads/", mode: 'copy'
 
     input:
         set sample_id, file(reads) from fastq_ch
@@ -119,7 +117,7 @@ process trim_and_combine {
  */
 process decont {
     tag { "Decontaminating " + sample_id }
-    publishDir "${params.publishdir}/${sample_id}/reads/", mode: 'copy'
+    publishDir "${params.outdir}/${sample_id}/reads/", mode: 'copy'
     
     input:
         set sample_id, file(fq1), file(fq2) from trim_and_combine_ch
@@ -142,21 +140,23 @@ process decont {
 
 /* Metagenomics classification: QC for sample purity
  */
-process kraken {
-    tag { "Running Kraken on " + sample_id }
-    publishDir "${params.publishdir}/${sample_id}/", mode: 'copy'
-
-    input:
-        set sample_id, file(fq1), file(fq2) from fastq_for_kraken_ch
-    output:
-        file("${sample_id}_kraken.report")
-    script:
-        """
-        kraken --threads ${task.cpus} --preload --db ${kraken_db} \
-          -paired ${fq1} ${fq2} > kraken.out;
-        # do not gzip! otherwise kraken-report happily runs (with some warnings) and produces rubbish results
-        kraken-report --db ${kraken_db} kraken.out > ${sample_id}_kraken.report
-        """
+if(!params.skip_kraken) {
+    process kraken {
+        tag { "Running Kraken on " + sample_id }
+        publishDir "${params.outdir}/${sample_id}/", mode: 'copy'
+        
+        input:
+            set sample_id, file(fq1), file(fq2) from fastq_for_kraken_ch
+        output:
+            file("${sample_id}_kraken.report")
+        script:
+            """
+            kraken --threads ${task.cpus} --preload --db ${kraken_db} \
+              -paired ${fq1} ${fq2} > kraken.out;
+            # do not gzip! otherwise kraken-report happily runs (with some warnings) and produces rubbish results
+            kraken-report --db ${kraken_db} kraken.out > ${sample_id}_kraken.report
+            """
+    }
 }
 
 
@@ -164,9 +164,9 @@ process kraken {
  * possible for such samples (>100k). tadpole gave consistently better
  * results (fewer errors/variants) than spades (with diginorm)
  */
-process tadpole { tag {
-"Tadpole assembly of " + sample_id } publishDir
-"${params.publishdir}/${sample_id}/", mode: 'copy'
+process tadpole {
+    tag { "Tadpole assembly of " + sample_id }
+    publishDir "${params.outdir}/${sample_id}/", mode: 'copy'
     
     input:
         set sample_id, file(fq1), file(fq2) from fastq_for_tadpole
@@ -183,7 +183,7 @@ process tadpole { tag {
  */
 process gap_fill_assembly {
     tag { "Orienting and gap filling contigs for " + sample_id }
-    publishDir "${params.publishdir}/${sample_id}/", mode: 'copy'
+    publishDir "${params.outdir}/${sample_id}/", mode: 'copy'
     // capture special error code, telling us that we cannot proceed for valid reasons.
     // meaning of consequently missing downstream files needs to be reflected in docs
     errorStrategy = { task.exitStatus == 3 ? 'ignore' : 'terminate' }
@@ -216,7 +216,7 @@ process gap_fill_assembly {
  */
 process polish_assembly {
     tag { "Polishing assembly for " + sample_id }
-    publishDir "${params.publishdir}/${sample_id}/", mode: 'copy'
+    publishDir "${params.outdir}/${sample_id}/", mode: 'copy'
     
     input:
         set sample_id, file(assembly_fa), file(assembly_gaps_bed), file(fq1), file(fq2) \
@@ -234,11 +234,11 @@ process polish_assembly {
 }
 
 
-/* mapping against polished assembly
+/* Mapping against polished assembly
  */
 process final_mapping {
     tag { "Mapping to polished assembly for " + sample_id }
-    publishDir "${params.publishdir}/${sample_id}/", mode: 'copy'
+    publishDir "${params.outdir}/${sample_id}/", mode: 'copy'
 
     input:
         set sample_id, file(ref_fa), file(fq1), file(fq2) \
@@ -266,7 +266,7 @@ process final_mapping {
  */
 process var_calling {
     tag { "Final variant calling for " + sample_id }
-    publishDir "${params.publishdir}/${sample_id}/", mode: 'copy'
+    publishDir "${params.outdir}/${sample_id}/", mode: 'copy'
 
     input:
         set sample_id, file(ref_fa), file(bam), file(bai) from final_mapping_for_vcf_ch
@@ -287,7 +287,7 @@ process var_calling {
  */
 process genomecov {
     tag { "Genome coverage for " + sample_id }
-    publishDir "${params.publishdir}/${sample_id}/", mode: 'copy'
+    publishDir "${params.outdir}/${sample_id}/", mode: 'copy'
 
     input:
         set sample_id, file(ref_fa), file(bam), file(bai) from final_mapping_for_cov_ch
@@ -305,7 +305,7 @@ process genomecov {
  */
 process vipr_tools {
     tag { "Plotting AF vs. coverage and readying fasta for  " + sample_id }
-    publishDir "${params.publishdir}/${sample_id}/", mode: 'copy'
+    publishDir "${params.outdir}/${sample_id}/", mode: 'copy'
 
     input:
         set sample_id, file(cov), file(ref_fa), file(vcf) from cov_ch.join(vcf_ch)
@@ -313,8 +313,6 @@ process vipr_tools {
         set sample_id, file("${sample_id}_af-vs-cov.html"), file("${sample_id}_0cov2N.fa")
     script:
         """
-        # prevent CONDA_PATH_BACKUP: unbound variable
-        set +u; source activate matplotlib-py3-2.2.2; set -u;
         vipr_af_vs_cov_html.py --vcf ${vcf} --cov ${cov} --plot ${sample_id}_af-vs-cov.html;
         vipr_gaps_to_n.py -i ${ref_fa} -c ${cov} > ${sample_id}_0cov2N.fa;
         """

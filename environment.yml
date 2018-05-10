@@ -1,6 +1,6 @@
 # You can use this file to create a conda environment for this pipeline:
 #   conda env create -f environment.yml
-name: nfcore-vipr-1.0
+name: nfcore-vipr-1.0-dev
 channels:
   - bioconda
   - conda-forge

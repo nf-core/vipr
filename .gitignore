@@ -7,3 +7,6 @@ trace.txt.*
 report.html.[0-9]*
 trace.txt
 report.html
+.DS_Store
+tmp/
+outdir/
