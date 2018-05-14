@@ -2,15 +2,14 @@ ref_fasta: "data/ref/DENV2-NC_001474.2.fa"
 # cont_fasta needs to be bwa indexed already
 cont_fasta: "/mnt/projects/rpd/genomes/human_g1k_v37/human_g1k_v37.fasta"
 kraken_db: "/mnt/projects/rpd/genomes/kraken/minikraken_20171019_8GB/"
-outdir: "my-outdir"
 skip_kraken: false
 samples:
   PDH203_GTGGCC:
     readunits:
-      ru-PDH203.1M.1:
-        fq1: data/reads/PDH203_GTGGCC_NA_R1.1M.1.fastq.gz
-        fq2: data/reads/PDH203_GTGGCC_NA_R2.1M.1.fastq.gz
-      ru-PDH203.1M.2:
-        fq1: data/reads/PDH203_GTGGCC_NA_R1.1M.2.fastq.gz
-        fq2: data/reads/PDH203_GTGGCC_NA_R2.1M.2.fastq.gz
+      PDH203-10K-1:
+        fq1: data/reads/PDH203_downsampled/PDH203_GTGGCC_NA_R1.1-n100000.fastq.gz
+        fq2: data/reads/PDH203_downsampled/PDH203_GTGGCC_NA_R2.1-n100000.fastq.gz
+      PDH203-10K-2:
+        fq1: data/reads/PDH203_downsampled/PDH203_GTGGCC_NA_R1.2-n100000.fastq.gz
+        fq2: data/reads/PDH203_downsampled/PDH203_GTGGCC_NA_R2.2-n100000.fastq.gz
 

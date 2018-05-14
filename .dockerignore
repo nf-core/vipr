@@ -1,0 +1,9 @@
+my-publishdir
+publish
+tmp
+work
+trace*
+report.html*
+MUX*
+fastq_input
+data

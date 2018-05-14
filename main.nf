@@ -3,9 +3,9 @@
  * vim: syntax=groovy
  * -*- mode: groovy;-*-
  *
- ===============================================================================
- ViPR: Viral amplicon analysis and intrahost / low-frequency variant calling
- ===============================================================================
+ ======================================================================
+ ViPR: Viral amplicon/enrichment analysis and intrahost variant calling
+ ======================================================================
  # Homepage / Documentation
  https://github.com/nf-core/vipr
  # Authors
@@ -46,7 +46,7 @@ if(!params.skip_kraken) {
 }
 
 log.info "=================================================="
-log.info " nf-core/vipr : Viral amplicon analysis v${params.version}"
+log.info " nf-core/vipr : Viral amplicon/enrichment analysis and intrahost variant calling: v${params.version}"
 log.info "=================================================="
 
 
