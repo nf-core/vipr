@@ -104,8 +104,6 @@ nextflow run /path/to/nf-core-vipr -with-singularity /path/to/nfcore-vipr-[VERSI
 
 #### 3.2) Software deps: bioconda
 
-[//]: # (FIXME check if this works with our nested setup)
-
 If you're unable to use either Docker or Singularity but you have
 conda installed, you can use the bioconda environment that comes with
 the pipeline. Running this command will create a new conda environment

@@ -1,7 +1,7 @@
 ref_fasta: "data/ref/DENV2-NC_001474.2.fa"
 # cont_fasta needs to be bwa indexed already
-cont_fasta: "/mnt/projects/rpd/genomes/human_g1k_v37/human_g1k_v37.fasta"
-kraken_db: "/mnt/projects/rpd/genomes/kraken/minikraken_20171019_8GB/"
+cont_fasta: "/db/genomes/human_g1k_v37/human_g1k_v37.fasta"
+kraken_db: "/db/genomes/kraken/minikraken_20171019_8GB/"
 skip_kraken: false
 samples:
   PDH203_GTGGCC:

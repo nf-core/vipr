@@ -35,7 +35,7 @@ variant integration
 - `{sample}_0cov2N.fa`: submission-ready reference with zero coverage
   positions masked
 
-## Auxiliary analysis
+## Mapping and variant calling
 
 - `{sample}_kraken.report.txt`: Kraken report
 - `{sample}.cov.gz`: Coverage per position
@@ -45,9 +45,7 @@ variant integration
 - `{sample}.vcf.gz`: LoFreq variant calls for BAM file
 - `{sample}_af-vs-cov.html`: Interactive plot of variant AF vs coverage
 
-An screenshot of the interative plot is below:
-
-[interactiveplot](images/interactive-plot.png)
+A screenshot of the interative plot follows: ![interactiveplot](images/interactive-plot.png)
 
 
 ---
