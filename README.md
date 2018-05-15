@@ -75,7 +75,6 @@ nfcore/vipr is used mainly by the Bioinformatics Core of the Genome
 Institue of Singapore. If you use this pipeline too, please let us
 know in an issue and we will add you to the list.
 
-
 <table>
   <tr>
     <td><img src="docs/images/gis_logo.png" width="100"></td>
@@ -88,4 +87,3 @@ know in an issue and we will add you to the list.
     <td>http://www.igap.io</td>
   </tr>
 </table>
-
