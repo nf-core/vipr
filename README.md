@@ -79,11 +79,11 @@ know in an issue and we will add you to the list.
 <table>
   <tr>
     <td>
-      <img src="docs/images/gis_logo.png" width="100"><a href="http://www.igap.io">
-      <img src="docs/images/igap_logo.png" width="100"></a>
+      <img src="docs/images/gis_logo.png" width="100">
+      <img src="docs/images/igap_logo.png" width="100">
     </td>
     <td>Genome Institue of Singapore</td>
-    <td>https://www.a-star.edu.sg/gis/</td>
-</tr>
+    <td>https://www.a-star.edu.sg/gis/ <br>http://www.igap.io</td>
+ </tr>
 </table>
----
+
