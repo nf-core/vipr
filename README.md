@@ -75,15 +75,8 @@ nfcore/vipr is used mainly by the Bioinformatics Core / iGap of the Genome
 Institue of Singapore. If you use this pipeline too, please let us
 know in an issue and we will add you to the list.
 
-
-<table>
-  <tr>
-    <td>
-      <img src="docs/images/gis_logo.png" width="100">
-      <img src="docs/images/igap_logo.png" width="100">
-    </td>
-    <td>Genome Institue of Singapore</td>
-    <td>https://www.a-star.edu.sg/gis/ <br>http://www.igap.io</td>
- </tr>
-</table>
+| Logo                                              | Insitute                     | URL                            |
+|---------------------------------------------------|------------------------------|--------------------------------|
+| <img src="docs/images/gis_logo.png" width="100">  | Genome Institue of Singapore | https://www.a-star.edu.sg/gis/ |
+| <img src="docs/images/igap_logo.png" width="100"> | iGap                         | http://www.igap.io             |
 
