@@ -1,14 +1,21 @@
+import shutil
+
 # non-login bash
 shell.executable("/bin/bash")
 shell.prefix("set -euo pipefail;")
+
+
+
+# run locally so check for nextflow here
+assert shutil.which("nextflow")
 
 
 REFS = {'correct': '../ref/DENV2-NC_001474.2.fa',
         'mutated': '../ref/DENV2-NC_001474.2.mut5p.fa',
         'wrong': '../ref/DENV1-NC_001477.1.fa'}
 TEMPL_YAML = "PDH203-PDH205-2x10k.template.yaml"
-NF_FNAME = "../../main.nf"
-CFG_FNAME = "../../nextflow.config"
+NF_FNAME = "../main.nf"
+CFG_FNAME = "../nextflow.config"
 PROFILE = "gis"
 
 
@@ -37,16 +44,21 @@ rule nextflow:
     """Run nextflow
     """
     input:
-       '{prefix}/params.yaml'
+       nffile=NF_FNAME,
+       nfcfg=CFG_FNAME,
+       params='{prefix}/params.yaml'
     output:
         touch('{prefix}/COMPLETE')
+    params:
+        profile = PROFILE
     #message:
     #    "Running Nextflow in {prefix}"
     shell:
         """
         cd $(dirname {output});
         export NXF_OPTS="-Xms500m -Xmx2000m";
-        nextflow run {NF_FNAME} -c {CFG_FNAME} -profile {PROFILE} -params-file params.yaml >& exec.log;
+        # we are one directory down now, so ../ (ugly)
+        nextflow run ../{input.nffile} -c ../{input.nfcfg} -profile {params.profile} -params-file $(basename {input.params}) >& exec.log;
         rm -rf work;
         """
 

@@ -1,11 +1,9 @@
 # nf-core/vipr
 
-nf-core/vipr is a pipeline for viral amplicon analysis and intrahost /
-low-frequency variant calling. This document describes the output
-produced by the pipeline. Results will appear in the directory
-specified with the `--outdir` parameter (by default `results`). Each
-sample has its own subdirectory. The structure of a sample
-subdirectory is described in the following.
+This document describes the output produced by the pipeline. Results
+will appear in the directory specified with the `--outdir` parameter
+(default: `results`). Each sample has its own subdirectory. The
+structure of a sample subdirectory is described in the following.
 
 
 ## Read Data

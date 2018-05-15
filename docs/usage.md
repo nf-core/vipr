@@ -35,7 +35,7 @@ Note that the pipeline will create the following files in your working directory
 work            # Directory containing the nextflow working files
 results         # Finished results (configurable, see below)
 .nextflow_log   # Log file from Nextflow
-# Other nextflow hidden files, eg. history of pipeline runs and old logs.
+# Other nextflow hidden files, e.g. history of pipeline runs and old logs.
 ```
 
 ### Updating the pipeline
@@ -62,8 +62,8 @@ pipeline, even if there have been changes to the code since.
 First, go to the
 [nf-core/vipr releases page](https://github.com/nf-core/vipr/releases)
 and find the latest version number - numeric only (e.g. `1.0`). Then
-specify this when running the pipeline with `-r` (one hyphen) -
-eg. `-r 1.0`.
+specify this when running the pipeline with `-r` (one hyphen),
+e.g. `-r 1.0`.
 
 This version number will be logged in reports when you run the
 pipeline, so that you'll know what you used when you look back in the
@@ -75,7 +75,7 @@ future.
 ### `-params-file`
 
 You can modify program behaviour and specify input files in a yaml
-configuration file. An example is given in `example_params.yaml`.
+configuration file. An example is given in [`example_params.yaml`](../example_params.yaml).
 
 Please note: this is currently the only way to specify read input.
 The corresponding entries in params.yaml looks as follows:
@@ -130,14 +130,14 @@ You can add the above parameters to your params-file (see above). Then entries l
 ```nextflow
 params {
   ref_fasta: "data/ref/DENV2-NC_001474.2.fa"
-  cont_fasta: "/mnt/projects/rpd/genomes/human_g1k_v37/human_g1k_v37.fasta"
-  kraken_db: "/mnt/projects/rpd/genomes/kraken/minikraken_20171019_8GB/"
+  cont_fasta: "/db/genomes/human_g1k_v37/human_g1k_v37.fasta"
+  kraken_db: "/db/genomes/kraken/minikraken_20171019_8GB/"
   skip_kraken: false
   }
 }
 ```
 
-An example is given in `example_params.yaml`.
+An example is given in [`example_params.yaml`](../example_params.yaml).
 
 ### `--outdir`
 The output directory where the results will be saved.

@@ -114,7 +114,7 @@ with all of the required software installed:
 ```bash
 conda env create -f environment.yml
 conda clean -a # Recommended, not essential
-source activate nfcore-vipr-1.3 # Name depends on version
+source activate nfcore-vipr-1.0 # Name depends on version
 ```
 
 The [`environment.yml`](../environment.yml) file is packaged with the
@@ -157,4 +157,4 @@ The nf-core/vipr pipeline requires
 - a host reference genome for decontamination (needs to be BWA indexed)
 - a [Kraken database](https://ccb.jhu.edu/software/kraken/) for read classification
 
-See also [usage documentatin](`usage.md`)
+See also [usage documentation](`usage.md`)
