@@ -1,0 +1,101 @@
+# non-login bash
+shell.executable("/bin/bash")
+shell.prefix("set -euo pipefail;")
+
+
+REFS = {'correct': '../ref/DENV2-NC_001474.2.fa',
+        'mutated': '../ref/DENV2-NC_001474.2.mut5p.fa',
+        'wrong': '../ref/DENV1-NC_001477.1.fa'}
+TEMPL_YAML = "PDH203-PDH205-2x10k.template.yaml"
+NF_FNAME = "../../main.nf"
+CFG_FNAME = "../../nextflow.config"
+PROFILE = "gis"
+
+
+rule final:
+    input:
+        #expand('out-{lbl}/COMPLETE', lbl=REFS)
+        "tests.PASSED"
+
+
+rule create_params:
+    input:
+        yaml = TEMPL_YAML
+    output:
+        yaml = 'out-{lbl}/params.yaml'
+    params:
+        ref_fasta = lambda wc: REFS[wc.lbl],
+        kraken_db = "unused"
+    run:
+        with open(input.yaml) as fh:
+            c = fh.read()
+        with open(output.yaml, 'w') as fh:
+            fh.write(c.format(ref_fasta=params.ref_fasta, kraken_db=params.kraken_db))
+
+
+rule nextflow:
+    """Run nextflow
+    """
+    input:
+       '{prefix}/params.yaml'
+    output:
+        touch('{prefix}/COMPLETE')
+    #message:
+    #    "Running Nextflow in {prefix}"
+    shell:
+        """
+        cd $(dirname {output});
+        export NXF_OPTS="-Xms500m -Xmx2000m";
+        nextflow run {NF_FNAME} -c {CFG_FNAME} -profile {PROFILE} -params-file params.yaml >& exec.log;
+        rm -rf work;
+        """
+
+rule testing:
+    """Actual testing
+    """
+    input:
+        expand('out-{lbl}/COMPLETE', lbl=REFS)
+    output:
+        touch("tests.PASSED")
+    run:
+        import os
+        import glob
+        import gzip
+        
+        vcf_files = []
+        for f in input:
+            d = os.path.dirname(f)
+            matches = glob.glob(os.path.join(d, "results/*/*.vcf.gz"))
+            vcf_files.extend(matches)
+
+        num_vars = 0
+        for f in vcf_files:
+            with gzip.open(f, 'rt') as fh:
+                for lineno, line in enumerate(fh):
+                    if line.startswith('#'):
+                        continue
+                    else:
+                        num_vars += 1
+                        info = line.split("\t")[7]
+                        fields = dict()
+                        for kv in info.split(";"):
+                            if '=' in kv:
+                                k, v = kv.split('=')
+                                fields[k] = v
+                        af = float(fields['AF'])
+                        dp = int(fields['DP'])
+
+                        # consensus variants only allowed in sample
+                        # with completely wrong reference and only at
+                        # sites of "low coverage"
+                        if not 'wrong-ref' in f and not dp < 500:
+                            assert af < 0.5, ("Found (high coverage) consensus variant in %s at line %d" % (f, lineno))
+                        
+        assert num_vars > 0
+        print("PASS: Found some variants, but none of them were consensus variants")
+        assert len(vcf_files) > 4
+        print("PASS: Found expected number of vcf files")
+        
+        #FIXME find in correct and mutated outdir -name *polished_assembly.fa | xargs cat | mafft -
+        #Align all four with MAFFT and there should be <x differences (needs parser)
+        

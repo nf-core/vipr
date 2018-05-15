@@ -157,17 +157,4 @@ The nf-core/vipr pipeline requires
 - a host reference genome for decontamination (needs to be BWA indexed)
 - a [Kraken database](https://ccb.jhu.edu/software/kraken/) for read classification
 
-The corresponding entry in params.yaml looks as follows:
-
-[//]: # (FIXME check if this works with our nested setup)
-
-
-```nextflow
-params {
-    ref_fasta: <file>
-    cont_fasta: <file>
-    kraken_db: <directory>
-    ...
-}
-```
-
+See also [usage documentatin](`usage.md`)

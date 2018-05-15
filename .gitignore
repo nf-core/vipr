@@ -11,3 +11,11 @@ report.html
 tmp/
 outdir/
 timeline.html
+*flymake.py
+tests/tests.PASSED
+tests/out-correct/
+tests/out-mutated/
+tests/out-wrong/
+*#
+*DS_Store
+tests/.snakemake/

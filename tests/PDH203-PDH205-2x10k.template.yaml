@@ -1,0 +1,24 @@
+# paths relative to root dir!
+ref_fasta: "{ref_fasta}"
+# cont_fasta needs to be bwa indexed already
+cont_fasta: "../ref/human_g1k_v37.gl.fasta"
+kraken_db: "{kraken_db}"
+skip_kraken: true
+samples:
+  PDH203_GTGGCC:
+    readunits:
+      PDH203-10K-1:
+        fq1: ../reads/PDH203_downsampled/PDH203_GTGGCC_NA_R1.1-n100000.fastq.gz
+        fq2: ../reads/PDH203_downsampled/PDH203_GTGGCC_NA_R2.1-n100000.fastq.gz
+      PDH203-10K-2:
+        fq1: ../reads/PDH203_downsampled/PDH203_GTGGCC_NA_R1.2-n100000.fastq.gz
+        fq2: ../reads/PDH203_downsampled/PDH203_GTGGCC_NA_R2.2-n100000.fastq.gz
+  PDH205_CGTACG:
+    readunits:
+      PDH205-10K-1:
+        fq1: ../reads/PDH205_downsampled/PDH205_CGTACG_NA_R1.1-n100000.fastq.gz
+        fq2: ../reads/PDH205_downsampled/PDH205_CGTACG_NA_R2.1-n100000.fastq.gz
+      PDH205-10K-2:
+        fq1: ../reads/PDH205_downsampled/PDH205_CGTACG_NA_R1.2-n100000.fastq.gz
+        fq2: ../reads/PDH205_downsampled/PDH205_CGTACG_NA_R2.2-n100000.fastq.gz
+
