@@ -47,7 +47,7 @@ Documentation about the pipeline can be found in the `docs/` directory:
 
 ### Credits
 
-This pipeline was developed at the
+This pipeline was originally developed at the
 [Genome Institute of Singapore](http://a-star.edu.sg/gis) by
 [Andreas Wilm](https://github.com/andreas-wilm/). It started out as an
 ecosystem around LoFreq an went through a couple of iterations. The
@@ -68,3 +68,22 @@ Plenty of people provided essential feedback, including:
 - ZHU Yuan
 - Shuzhen SIM
 - CHU Wenhan Collins
+
+### Participating Institutes
+
+nfcore/vipr is used mainly by the Bioinformatics Core / iGap of the Genome
+Institue of Singapore. If you use this pipeline too, please let us
+know in an issue and we will add you to the list.
+
+
+<table>
+  <tr>
+    <td>
+      <img src="docs/images/gis_logo.png" width="100"><a href="http://www.igap.io">
+      <img src="docs/images/igap_logo.png" width="100"></a>
+    </td>
+    <td>Genome Institue of Singapore</td>
+    <td>https://www.a-star.edu.sg/gis/</td>
+</tr>
+</table>
+---

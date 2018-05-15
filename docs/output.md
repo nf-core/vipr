@@ -48,10 +48,4 @@ variant integration
 A screenshot of the interative plot follows: ![interactiveplot](images/interactive-plot.png)
 
 
----
-
-[![Genome Institue of Singapore](images/gis_logo.png)](https://www.a-star.edu.sg/gis/)
-[![iGap](images/igap_logo.png)](http://www.igap.io//)
-
----
 
