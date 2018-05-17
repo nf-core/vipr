@@ -1,7 +1,5 @@
 #!/usr/bin/env nextflow
 /*
- * vim: syntax=groovy
- * -*- mode: groovy;-*-
  *
  ======================================================================
  ViPR: Viral amplicon/enrichment analysis and intrahost variant calling
