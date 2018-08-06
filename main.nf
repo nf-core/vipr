@@ -1,7 +1,5 @@
 #!/usr/bin/env nextflow
 /*
- * vim: syntax=groovy
- * -*- mode: groovy;-*-
  *
  ======================================================================
  ViPR: Viral amplicon/enrichment analysis and intrahost variant calling
@@ -32,16 +30,16 @@ try {
 /* Input validation
  */
 input_ref_fasta = file(params.ref_fasta)
-if (!input_ref_fasta.exists()) 
+if (!input_ref_fasta.exists())
   exit 1, "Missing input reference fasta file: ${input_ref_fasta}"
 
 cont_fasta = file(params.cont_fasta)
-if (!cont_fasta.exists()) 
+if (!cont_fasta.exists())
   exit 1, "Missing contamination fasta file: ${cont_fasta}"
 
 if(!params.skip_kraken) {
     kraken_db = file(params.kraken_db)
-    if (!kraken_db.exists()) 
+    if (!kraken_db.exists())
     exit 1, "Missing contamination fasta file: ${kraken_db}"
 }
 
@@ -73,7 +71,7 @@ cont_fasta_ch = Channel.from(
 
 
 /* FIXME allow other means of defining input, e.g. CSV.
- * input for fastq files. channel has sample name as key and all read pairs following 
+ * input for fastq files. channel has sample name as key and all read pairs following
  * see https://groups.google.com/forum/#!topic/nextflow/CF7Joh5xrkU
  */
 sample_keys = params.samples.keySet()
@@ -104,8 +102,8 @@ process trim_and_combine {
             let pairno=pairno+1
             # note: don't make reads smaller than assembler kmer length
             skewer --quiet -t ${task.cpus} -m pe -q 3 -n -l 31 -z -o pair\${pairno}-skewer-out \$fq1 \$fq2;
-            cat *-trimmed-pair1.fastq.gz >> ${sample_id}_R1-trimmed.fastq.gz; 
-            cat *-trimmed-pair2.fastq.gz >> ${sample_id}_R2-trimmed.fastq.gz; 
+            cat *-trimmed-pair1.fastq.gz >> ${sample_id}_R1-trimmed.fastq.gz;
+            cat *-trimmed-pair2.fastq.gz >> ${sample_id}_R2-trimmed.fastq.gz;
             rm *-trimmed-pair[12].fastq.gz;
         done
         fastqc -t {task.cpus} ${sample_id}_R1-trimmed.fastq.gz ${sample_id}_R2-trimmed.fastq.gz;
@@ -118,7 +116,7 @@ process trim_and_combine {
 process decont {
     tag { "Decontaminating " + sample_id }
     publishDir "${params.outdir}/${sample_id}/reads/", mode: 'copy'
-    
+
     input:
         set sample_id, file(fq1), file(fq2) from trim_and_combine_ch
         set file(cont_fasta), file(cont_amb), file(cont_ann), file(cont_bwt), \
@@ -144,7 +142,7 @@ if(!params.skip_kraken) {
     process kraken {
         tag { "Running Kraken on " + sample_id }
         publishDir "${params.outdir}/${sample_id}/", mode: 'copy'
-        
+
         input:
             set sample_id, file(fq1), file(fq2) from fastq_for_kraken_ch
         output:
@@ -167,11 +165,11 @@ if(!params.skip_kraken) {
 process tadpole {
     tag { "Tadpole assembly of " + sample_id }
     publishDir "${params.outdir}/${sample_id}/", mode: 'copy'
-    
+
     input:
         set sample_id, file(fq1), file(fq2) from fastq_for_tadpole
     output:
-        set sample_id, file("${sample_id}_contigs.fa") into contigs_ch    
+        set sample_id, file("${sample_id}_contigs.fa") into contigs_ch
     script:
         """
         tadpole.sh -Xmx10g threads=${task.cpus} in=${fq1} in2=${fq2} out=${sample_id}_contigs.fa,
@@ -187,10 +185,10 @@ process gap_fill_assembly {
     // capture special error code, telling us that we cannot proceed for valid reasons.
     // meaning of consequently missing downstream files needs to be reflected in docs
     errorStrategy = { task.exitStatus == 3 ? 'ignore' : 'terminate' }
-    
+
     input:
         set sample_id, file(contigs_fa) from contigs_ch
-        file(input_ref_fasta)    
+        file(input_ref_fasta)
     output:
         set sample_id, file("${sample_id}-gap-filled-assembly.fa"), file("${sample_id}-gap-filled-assembly.gaps.bed") \
             into gap_filled_assembly_ch
@@ -212,12 +210,12 @@ process gap_fill_assembly {
 }
 
 
-/* Polish assembly by repeated mapping, variant calling and variant incorporation 
+/* Polish assembly by repeated mapping, variant calling and variant incorporation
  */
 process polish_assembly {
     tag { "Polishing assembly for " + sample_id }
     publishDir "${params.outdir}/${sample_id}/", mode: 'copy'
-    
+
     input:
         set sample_id, file(assembly_fa), file(assembly_gaps_bed), file(fq1), file(fq2) \
             from gap_filled_assembly_ch.join(fastq_for_polish_assembly_ch)
@@ -258,7 +256,7 @@ process final_mapping {
             samtools sort -o ${sample_id}.bam -T ${sample_id}.final.tmp -;
         samtools index ${sample_id}.bam;
         samtools stats ${sample_id}.bam > ${sample_id}.bam.stats
-        """        
+        """
 }
 
 
@@ -277,11 +275,11 @@ process var_calling {
         samtools faidx ${ref_fa};
         lofreq call-parallel --pp-threads ${task.cpus} -f ${ref_fa} \
            -d 1000000 --call-indels -o ${sample_id}.vcf.gz ${bam}
-        """        
+        """
 }
 
 
-/* Compute coverage 
+/* Compute coverage
 *
  * FIXME: fast process, best joined with another process
  */
@@ -337,5 +335,3 @@ workflow.onComplete {
 workflow.onError {
     println "Oops... Pipeline execution stopped with the following message: ${workflow.errorMessage}"
 }
-
-
