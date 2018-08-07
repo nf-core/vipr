@@ -6,20 +6,13 @@
 [![Docker Container available](https://img.shields.io/docker/automated/nfcore/vipr.svg)](https://hub.docker.com/r/nfcore/vipr/)
 [![https://www.singularity-hub.org/static/img/hosted-singularity--hub-%23e32929.svg](https://www.singularity-hub.org/static/img/hosted-singularity--hub-%23e32929.svg)](https://singularity-hub.org/collections/1405)
 
-
-
 ### Introduction
 
 **nf-core/vipr** is a bioinformatics best-practice analysis pipeline
 for assembly and intrahost / low-frequency variant calling for viral
 samples.
 
-The pipeline uses [Nextflow](https://www.nextflow.io), a
-bioinformatics workflow tool. It pre-processes raw data from FastQ
-inputs, aligns the reads and performs extensive quality-control on the
-results.
-
-
+The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It comes with docker / singularity containers making installation trivial and results highly reproducible.
 
 ### Pipeline Steps
 
@@ -34,8 +27,6 @@ results.
 | Low frequency variant calling                       | LoFreq                              |
 | Coverage and variant AF plots (two processes)       | Bedtools, ViPR Tools                |
 
-
-
 ### Documentation
 
 Documentation about the pipeline can be found in the `docs/` directory:
@@ -44,14 +35,11 @@ Documentation about the pipeline can be found in the `docs/` directory:
 2. [Running the pipeline](docs/usage.md)
 3. [Output and how to interpret the results](docs/output.md)
 
-
 ### Credits
 
-This pipeline was originally developed at the
-[Genome Institute of Singapore](http://a-star.edu.sg/gis) by
-[Andreas Wilm](https://github.com/andreas-wilm/). It started out as an
-ecosystem around LoFreq an went through a couple of iterations. The
-current version had three predecessors
+This pipeline was originally developed by Andreas Wilm ([andreas-wilm](https://github.com/andreas-wilm)) at [Genome Institute of Singapore](https://www.a-star.edu.sg/gis/).
+It started out as an ecosystem around LoFreq an went through a couple of iterations.
+The current version had three predecessors
 [ViPR 1](https://github.com/CSB5/vipr),
 [ViPR 2](https://github.com/CSB5/vipr2) and
 [ViPR 3](https://github.com/gis-rpd/pipelines/tree/master/germs/vipr)
@@ -68,22 +56,3 @@ Plenty of people provided essential feedback, including:
 - ZHU Yuan
 - Shuzhen SIM
 - CHU Wenhan Collins
-
-### Participating Institutes
-
-nfcore/vipr is used mainly by the Bioinformatics Core of the Genome
-Institue of Singapore. If you use this pipeline too, please let us
-know in an issue and we will add you to the list.
-
-<table>
-  <tr>
-    <td><img src="docs/images/gis_logo.png" width="100"></td>
-    <td>Genome Institute of Singapore</td>
-    <td>https://www.a-star.edu.sg/gis/</td>
-  </tr>
-  <tr>
-    <td><img src="docs/images/igap_logo.png" width="100"></td>
-    <td>iGap</td>
-    <td>http://www.igap.io</td>
-  </tr>
-</table>
