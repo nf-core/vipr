@@ -38,7 +38,7 @@ Documentation about the pipeline can be found in the `docs/` directory:
 ### Credits
 
 This pipeline was originally developed by Andreas Wilm ([andreas-wilm](https://github.com/andreas-wilm)) at [Genome Institute of Singapore](https://www.a-star.edu.sg/gis/).
-It started out as an ecosystem around LoFreq an went through a couple of iterations.
+It started out as an ecosystem around LoFreq and went through a couple of iterations.
 The current version had three predecessors
 [ViPR 1](https://github.com/CSB5/vipr),
 [ViPR 2](https://github.com/CSB5/vipr2) and
