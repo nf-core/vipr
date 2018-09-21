@@ -88,11 +88,6 @@ if(!params.skip_kraken) {
     exit 1, "Missing contamination fasta file: ${kraken_db}"
 }
 
-if(workflow.profile == 'awsbatch'){
-    //Check whether the required parameters are set accordingly
-    if(!params.awsqueue || !params.awsregion)
-}
-
 log.info "=================================================="
 log.info " nf-core/vipr : Viral amplicon/enrichment analysis and intrahost variant calling: v${params.version}"
 log.info "=================================================="
