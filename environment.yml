@@ -2,10 +2,11 @@
 #   conda env create -f environment.yml
 name: nf-core-vipr-1.0dev
 channels:
-  - bioconda
   - conda-forge
+  - bioconda
   - defaults
 dependencies:
+  - python=3.6
   # cargocult
   - conda-forge::openjdk=8.0.144 # Needed for FastQC - conda build hangs without this
   - bbmap=37.17 # for tadpole
