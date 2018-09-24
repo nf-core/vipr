@@ -1,6 +1,6 @@
 # You can use this file to create a conda environment for this pipeline:
 #   conda env create -f environment.yml
-name: nfcore-vipr-1.0-dev
+name: nf-core-vipr-1.0dev
 channels:
   - bioconda
   - conda-forge
@@ -8,8 +8,8 @@ channels:
 dependencies:
   # cargocult
   - conda-forge::openjdk=8.0.144 # Needed for FastQC - conda build hangs without this
-  - bbmap=37.17# for tadpole
-  - mummer=3.23# for nucmer in simple-contig-joiner
+  - bbmap=37.17 # for tadpole
+  - mummer=3.23 # for nucmer in simple-contig-joiner
   - lofreq=2.1.3.1
   - skewer=0.2.2
   - kraken=1.0
@@ -18,6 +18,6 @@ dependencies:
   - seqtk=1.2
   - samtools=1.3
   - bwa=0.7.15
-  - tabix=0.2.5# for polish-viral-ref
-  - bcftools=1.6# for polish-viral-ref
-  - plotly=2.5.1# for plotting only
+  - tabix=0.2.5 # for polish-viral-ref
+  - bcftools=1.6 # for polish-viral-ref
+  - plotly=2.5.1 # for plotting only

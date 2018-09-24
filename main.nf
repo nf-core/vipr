@@ -15,7 +15,7 @@
 def helpMessage() {
     log.info"""
     ===================================
-     nfcore/vipr  ~  version ${params.version}
+     nfcore/vipr  ~  version ${params.pipelineVersion}
     ===================================
     Usage:
 
@@ -89,7 +89,7 @@ if(!params.skip_kraken) {
 }
 
 log.info "=================================================="
-log.info " nf-core/vipr : Viral amplicon/enrichment analysis and intrahost variant calling: v${params.version}"
+log.info " nf-core/vipr : Viral amplicon/enrichment analysis and intrahost variant calling: v${params.pipelineVersion}"
 log.info "=================================================="
 
 
