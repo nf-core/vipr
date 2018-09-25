@@ -1,8 +1,10 @@
 # ![nf-core/vipr](docs/images/vipr_logo.png)
 
 [![Build Status](https://travis-ci.org/nf-core/vipr.svg?branch=master)](https://travis-ci.org/nf-core/vipr)
-[![Nextflow](https://img.shields.io/badge/nextflow-%E2%89%A50.30.1-brightgreen.svg)](https://www.nextflow.io/)
+[![Nextflow](https://img.shields.io/badge/nextflow-%E2%89%A50.31.1-brightgreen.svg)](https://www.nextflow.io/)
 [![Gitter](https://img.shields.io/badge/gitter-%20join%20chat%20%E2%86%92-4fb99a.svg)](https://gitter.im/nf-core/Lobby)
+
+[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](http://bioconda.github.io/)
 [![Docker Container available](https://img.shields.io/docker/automated/nfcore/vipr.svg)](https://hub.docker.com/r/nfcore/vipr/)
 [![https://www.singularity-hub.org/static/img/hosted-singularity--hub-%23e32929.svg](https://www.singularity-hub.org/static/img/hosted-singularity--hub-%23e32929.svg)](https://singularity-hub.org/collections/1405)
 
@@ -20,7 +22,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 |-----------------------------------------------------|-------------------------------------|
 | Trimming, combining of read-pairs per sample and QC | Skewer, FastQC                      |
 | Decontamination                                     | decont                              |
-| Metagenomics classifcation / Sample purity          | Kraken                              |
+| Metagenomics classification / Sample purity         | Kraken                              |
 | Assembly to contigs                                 | BBtools' Tadpole                    |
 | Assembly polishing                                  | ViPR Tools                          |
 | Mapping to assembly                                 | BWA, LoFreq                         |
